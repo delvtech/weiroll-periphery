@@ -6,8 +6,14 @@
   "author": "Element Inc.",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "compile": "npx hardhat compile"
+  },
   "dependencies": {
-    "hardhat": "^2.9.6"
+    "@openzeppelin/contracts": "^4.6.0",
+    "@openzeppelin/contracts-upgradeable": "^4.6.0",
+    "hardhat": "^2.9.6",
+    "weiroll": "^0.1.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
