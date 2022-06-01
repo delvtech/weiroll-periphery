@@ -6,7 +6,7 @@ import { Error } from "./Error.sol";
 
 library Assert {
 
-    function check(bool _conditionalStatement, Error.Type _error) external pure {
+    function check(bool _conditionalStatement, Error.Type _error) internal pure {
         if (!_conditionalStatement) {
             Error.emitError(_error);
         }
