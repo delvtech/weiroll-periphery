@@ -9,13 +9,15 @@ library Error {
     error IncorrectArrayLength();
     error UnAccountedETHBalance();
     error UnAccountedERC20Balance();
+    error PostCommandsCheckFailed();
 
     enum Type { 
         ZeroValue,
         NotAuthorised,
         IncorrectArrayLength,
         UnAccountedETHBalance,
-        UnAccountedERC20Balance
+        UnAccountedERC20Balance,
+        PostCommandsCheckFailed
     }
 
     function emitError(Type _errorType) internal pure {
@@ -29,6 +31,8 @@ library Error {
            revert UnAccountedETHBalance();
        } else if (_errorType == Type.UnAccountedERC20Balance) {
            revert UnAccountedERC20Balance();
+       } else if (_errorType == Type.PostCommandsCheckFailed) {
+           revert PostCommandsCheckFailed();
        }
     }
 }

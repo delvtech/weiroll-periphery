@@ -4,6 +4,7 @@ pragma solidity 0.8.14;
 
 import { VM } from "weiroll/contracts/VM.sol";
 import { Assert, Error } from "./library/Assert.sol";
+import { Expressions } from "./library/Expressions.sol";
 import { IERC20, SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -23,11 +24,27 @@ contract Router is VM, ReentrancyGuard {
 
     using SafeERC20 for IERC20;
 
-
+    /// Contains the details of the approvals
     struct Tokens {
         IERC20 identifier;
         uint256 amount;
         address receiver;
+    }
+
+    /// Data structure used to hold the details about the
+    /// validations that would get performed after all the commands
+    /// get executed successfully.
+    struct PostCommandsCheck {
+        // Address for whom the context would use.
+        // i.e. Alice address if her's WETH balance need to get queried.
+        address target;
+        // Address of the token.
+        // In above example it will be WETH token address.
+        address context;
+        // Value that would get compare with the target balance.
+        uint256 compareTo;
+        // Relationship between the compareTo & target balance.
+        Expressions.Operator op;
     }
 
     /// @dev TODO: Switch off the delegate call as it may come up with a lot of gateways to harm the system.
@@ -39,7 +56,8 @@ contract Router is VM, ReentrancyGuard {
     function execute(
         bytes32[] calldata commands,
         bytes[]   calldata state,
-        Tokens[]  calldata approvalTokens
+        Tokens[]  calldata approvalTokens,
+        PostCommandsCheck[] calldata checks
     ) 
         external 
         payable
@@ -47,16 +65,12 @@ contract Router is VM, ReentrancyGuard {
         returns (bytes[] memory data)
     {
         uint256 noOfApprovalTokens = approvalTokens.length;
-        uint256[] memory selfBeforeBalances = new uint256[](noOfApprovalTokens);
         // Keep the before balance of the ETH
         uint256 beforeEthBalance = address(this).balance;
         // Transfer tokens to the contract from the user so further interaction can go
         // through the router contract.
         for (uint256 i = 0; i < noOfApprovalTokens; i++) {
             Tokens memory t = approvalTokens[i];
-            // Calculate the before funds of the contract
-            // TODO: Need to find a way to avoid this as it is expensive if the no. of tokens are higher.
-            selfBeforeBalances[i] = t.identifier.balanceOf(address(this));
             // Check that receiver is not 0x0
             Assert.check(t.receiver != address(0), Error.Type.ZeroValue);
             // Move funds to the given receiver. It can be the `address(this)` or some other address as well.
@@ -65,8 +79,16 @@ contract Router is VM, ReentrancyGuard {
         data = _execute(commands, state);
 
         // Make sure at the end of the execution the balance delta is zero.
-        for (uint256 i = 0; i < noOfApprovalTokens; i++) {
-            Assert.check(selfBeforeBalances[i] == approvalTokens[i].identifier.balanceOf(address(this)), Error.Type.UnAccountedERC20Balance);
+        for (uint256 i = 0; i < checks.length; i++) {
+            PostCommandsCheck memory c = checks[i];
+            Assert.check(
+                Expressions.calculateExpr(
+                    IERC20(c.context).balanceOf(c.target),
+                    c.compareTo,
+                    c.op
+                ), 
+                Error.Type.PostCommandsCheckFailed
+            );
         }
         // Make sure the eth balance delta is remain zero.
         Assert.check(beforeEthBalance == address(this).balance, Error.Type.UnAccountedETHBalance);

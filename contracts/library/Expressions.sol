@@ -4,7 +4,7 @@ pragma solidity 0.8.14;
 
 library Expressions {
 
-    enum Operators {
+    enum Operator {
         LE,   // Less than equal
         GE,   // Greator than equal
         EQ,   // Equal
@@ -21,7 +21,7 @@ library Expressions {
     struct Condition {
         uint256 leftOperand;
         uint256 rightOperand;
-        Operators op;
+        Operator op;
     }
 
     struct Statement {
@@ -30,18 +30,18 @@ library Expressions {
         Conjunction cj;
     }
 
-    function calculateExpr(uint256 op1, uint256 op2, Operators op) internal pure returns(bool result) {
-        if (op == Operators.LE) {
+    function calculateExpr(uint256 op1, uint256 op2, Operator op) internal pure returns(bool result) {
+        if (op == Operator.LE) {
             return op1 == op2;
-        } else if (op == Operators.GE) {
+        } else if (op == Operator.GE) {
             return op1 >= op2;
-        } else if (op == Operators.EQ) {
+        } else if (op == Operator.EQ) {
             return op1 == op2;
-        } else if (op == Operators.LT) {
+        } else if (op == Operator.LT) {
             return op1 < op2;
-        } else if (op == Operators.GT) {
+        } else if (op == Operator.GT) {
             return op1 > op2;
-        } else if (op == Operators.NE) {
+        } else if (op == Operator.NE) {
             return op1 != op2;
         }
     }
@@ -62,8 +62,8 @@ library Expressions {
         return calculateExpr(cond.leftOperand, cond.rightOperand, cond.op);
     } 
 
-    function resolveStatement(Statement calldata st) internal pure returns(bool result) {
-        return false;//
+    function resolveStatement(Statement calldata stmt) internal pure returns(bool result) {
+        return calculateLogicalStatement(stmt.leftCondition, stmt.leftCondition, stmt.cj);
     }
 
 }
