@@ -1,0 +1,21 @@
+name: Tests
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+    unit:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Install dependencies
+          run: yarn install
+        - name: compile
+          run: yarn run compile
+        - name: test
+          run: yarn run test
