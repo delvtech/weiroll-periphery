@@ -9683,10 +9683,10 @@ weiroll.js@^0.3.1:
   dependencies:
     ethers "^5.3.1"
 
-weiroll@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/weiroll/-/weiroll-0.1.0.tgz#d9e15a8af880379f777b266cf00c42388dc9ca98"
-  integrity sha512-fW/PAAPwOufm67KYtlFR5BEzCWiAssKmf5N6r8SrUsPNg8A8WXKTpdgUWQyg90vxXd80XQIEGTWHOA4bCD2SiQ==
+weiroll@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/weiroll/-/weiroll-0.1.1.tgz#2fe981b93de12307ecb91b23db240b627ab6f745"
+  integrity sha512-FhH+e4PxQfQuRAKLdaQE+7Y7oO8PWUXFJnwneaCulZuVysxmlqocQ/u5fictCrOHVIvMHX9sTIjV9QoAAkyLVg==
 
 whatwg-fetch@^2.0.4:
   version "2.0.4"
