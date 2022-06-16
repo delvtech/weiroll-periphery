@@ -1,5 +1,8 @@
-node_modules
-artifacts
+*.json
+*.js
+*.md
+*.yaml
+lib/
 cache
-coverage*
-gasReporterOutput.json
+typechain/
+coverage/
