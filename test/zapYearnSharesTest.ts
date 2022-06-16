@@ -106,6 +106,56 @@ describe("Router", function () {
     stopImpersonating(usdcWhaleAddress);
   });
 
+  /**
+   *  Decoded structure of below test case planner call.
+           selector    flag       inputs       output             target address
+        [  ----4-----   -1   --------6--------   -1   ----------------20----------------------
+          '0xe63697c8   01   00 01 02 ff ff ff   ff   5f18c75abdae578b483e5f43f12a39cf75b973a9',  --- call
+          '0x70a08231   02   01 ff ff ff ff ff   01   a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',  --- staticall
+          '0x85f45c88   81   03 ff ff ff ff ff   83   e909128d38077bebd996692916865a5c24bfb522',  --- call
+          '0x77e2eefa   02   83 01 00 ff ff ff   ff   c6e7df5e7b4f2a278906862b61205850344d4e7d'   --- staticall
+        ]
+        [
+          '0x0000000000000000000000000000000000000000000000000000002df2362124',
+          '0x00000000000000000000000059b670e9fa9d0a427751af201d676719a970857b',  -- it get update with the balance of the position after the second command
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+          '0x00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8'
+        ]
+
+        ----------------------------------------------------------------------------------------------
+        for withdraw use below input - 
+
+        [0x0000000000000000000000000000000000000000000000000000002df2362124, -- shares
+        0x00000000000000000000000059b670e9fa9d0a427751af201d676719a970857b, -- position address
+        0x0000000000000000000000000000000000000000000000000000000000000000   -- 0
+        ]
+        ----------------------------------------------------------------------------------------------
+        for balanceOf use below input - 
+        [0x00000000000000000000000059b670e9fa9d0a427751af201d676719a970857b] -- position address
+
+        output - 
+
+        Added at the index 1 of state array
+        ----------------------------------------------------------------------------------------------
+        for prefundedDeposit use below input - 
+
+        [0x00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8] -- user address
+
+
+        output - 
+
+        Update the index 3 with bytes value i.e 64 in length 
+        ----------------------------------------------------------------------------------------------
+
+        For verifySuccessfulSharesIn the input is 
+
+        [
+            <dynamic length data start from index 3>,                               -- tuple value
+            <update balance in 2 call>,                                             -- balance queried in 2nd command
+            0x0000000000000000000000000000000000000000000000000000002df2362124      -- shares
+        ]
+  */
+
   it("Successful execution of pipeline", async () => {
     // Create a new planner
     const yearnSharesPlanner = new Planner();
@@ -126,6 +176,7 @@ describe("Router", function () {
       { identifier: yusdc.address, amount: shares, receiver: router.address },
     ];
     yearnSharesPlanner.add(wVault.withdraw(shares, position.address, 0));
+    console.log(`Yusdc address - ${yusdc.address}`);
     const retBalance = yearnSharesPlanner.add(
       wUsdc.balanceOf(position.address)
     );
